@@ -1,0 +1,17 @@
+title: Tamachirs.com
+description: บล็อกทดลองเกี่ยวกับชีวิต การเขียน และเทคโนโลยี
+lang: th
+author:
+  name: Tamachirs.com
+  email: khunjibna@tamachirs.com
+
+plugins:
+  - jekyll-paginate-v2
+
+pagination:
+  enabled: true
+  per_page: 6
+  permalink: /blog/page-:num/
+
+  
+baseurl: ""  # ถ้าโฮสต์ที่ root (ไม่มี subfolder)

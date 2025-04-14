@@ -1,0 +1,28 @@
+<header class="bg-gray-800 text-white">
+  <div class="container mx-auto flex justify-between items-center p-4">
+    <div class="text-xl font-bold">Tamachirs.com</div>
+
+    <!-- ปุ่มมือถือ -->
+    <div class="lg:hidden">
+      <button id="menu-toggle" class="focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- เมนู Desktop -->
+    <nav class="hidden lg:flex space-x-4">
+      {% for item in site.data.menu %}
+        <a href="{{ item.url }}" class="hover:bg-gray-700 px-3 py-2 rounded">{{ item.title }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+
+  <!-- เมนู Mobile -->
+  <div id="mobile-menu" class="hidden lg:hidden bg-gray-700 px-4 pb-4 space-y-2">
+    {% for item in site.data.menu %}
+      <a href="{{ item.url }}" class="block px-3 py-2 rounded hover:bg-gray-600">{{ item.title }}</a>
+    {% endfor %}
+  </div>
+</header>
