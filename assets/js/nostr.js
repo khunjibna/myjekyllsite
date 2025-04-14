@@ -4,6 +4,7 @@ const relayUrls = [
     'wss://nostr.wine',
     'wss://relay.notoshi.win',
     'wss://relay.siamstr.com',
+    'wss://relay.siamdev.cc/',
   ];
   
   const publicKey = '0f9da41389e1239d267c43105ecfc92273079e80c2d4b09e1d1e172701bd07d7'; // 👈 แทนที่ด้วย public key จริงของคุณ
