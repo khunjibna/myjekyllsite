@@ -11,7 +11,7 @@ plugins:
 pagination:
   enabled: true
   per_page: 6
-  permalink: /blog/page-:num/
+  permalink: /article/page-:num/
 
   
 baseurl: ""  # ถ้าโฮสต์ที่ root (ไม่มี subfolder)
