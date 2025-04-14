@@ -6,6 +6,9 @@
 
 - title: Article
   url: /article/
+  
+- title: Note
+  url: /note/
 
 - title: Project
   url: /project/
