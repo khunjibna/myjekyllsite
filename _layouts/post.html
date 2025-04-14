@@ -29,62 +29,62 @@
 
     <!-- บทความด้านขวา (8 ส่วนในหน้าจอใหญ่, 1 ส่วนในหน้าจอเล็ก) -->
     <div class="lg:w-2/3 xl:w-3/4">
-     
-        <!-- Main post content -->
-        <main class="flex-1">
 
-            <!-- 🔗 Breadcrumb -->
-            <nav class="text-sm text-gray-500 mb-4">
-                <a href="/" class="text-blue-600 hover:underline">Home</a>
-                {% if page.categories and page.categories.size > 0 %}
-                {% assign primary_category = page.categories[0] %}
-                &nbsp;&gt;&nbsp;
-                <a href="/{{ primary_category | slugify }}/" class="text-blue-600 hover:underline">
-                    {{ primary_category }}
-                </a>
-                {% endif %}
-                &nbsp;&gt;&nbsp;
-                <span class="text-gray-700">{{ page.title }}</span>
-            </nav>
+      <!-- Main post content -->
+      <main class="flex-1">
 
-            <div class="bg-white p-6 rounded border shadow-sm">
-                <!-- ชื่อเรื่อง -->
-                <h1 class="text-2xl font-bold mb-2 text-gray-800 pb-4 border-b">{{ page.title }}</h1>
-                
-                <!-- วันที่ / หมวดหมู่ -->
-                <p class="text-sm text-gray-500 mb-6 flex flex-wrap items-center gap-4">
+        <!-- 🔗 Breadcrumb -->
+        <nav class="text-sm text-gray-500 mb-4">
+          <a href="/" class="text-blue-600 hover:underline">Home</a>
+          {% if page.categories and page.categories.size > 0 %}
+          {% assign primary_category = page.categories[0] %}
+          &nbsp;&gt;&nbsp;
+          <a href="/{{ primary_category | slugify }}/" class="text-blue-600 hover:underline">
+            {{ primary_category }}
+          </a>
+          {% endif %}
+          &nbsp;&gt;&nbsp;
+          <span class="text-gray-700">{{ page.title }}</span>
+        </nav>
 
-                    <!-- วันที่ -->
-                    <span class="inline-flex items-center gap-1">
-                      <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2"
-                           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                      </svg>
-                      <span>{{ page.date | date: "%d/%m/%Y" }}</span>
-                    </span>
-                  
-                    {% if page.categories %}
-                    <!-- หมวดหมู่ -->
-                    <span class="inline-flex items-center gap-1">
-                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2"
-                           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M7 7a1 1 0 011-1h2.586a1 1 0 01.707.293l6.414 6.414a1 1 0 010 1.414l-4.586 4.586a1 1 0 01-1.414 0L7.293 12.707A1 1 0 017 12V8z"/>
-                      </svg>
-                      <span>{{ page.categories | join: ", " }}</span>
-                    </span>
-                    {% endif %}
-                  
-                  </p>
+        <div class="bg-white p-6 rounded border shadow-sm">
+          <!-- ชื่อเรื่อง -->
+          <h1 class="text-2xl font-bold mb-2 text-gray-800 pb-4 border-b">{{ page.title }}</h1>
 
-                <!-- เนื้อหาโพสต์ -->
-                <article class="prose prose-indigo max-w-none">
-                    {{ content }}
-                </article>
+          <!-- วันที่ / หมวดหมู่ -->
+          <p class="text-sm text-gray-500 mb-6 flex flex-wrap items-center gap-4">
 
-            </div>
-        </main>
+            <!-- วันที่ -->
+            <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{{ page.date | date: "%d/%m/%Y" }}</span>
+            </span>
+
+            {% if page.categories %}
+            <!-- หมวดหมู่ -->
+            <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M7 7a1 1 0 011-1h2.586a1 1 0 01.707.293l6.414 6.414a1 1 0 010 1.414l-4.586 4.586a1 1 0 01-1.414 0L7.293 12.707A1 1 0 017 12V8z" />
+              </svg>
+              <span>{{ page.categories | join: ", " }}</span>
+            </span>
+            {% endif %}
+
+          </p>
+
+          <!-- เนื้อหาโพสต์ -->
+          <article class="prose prose-indigo max-w-none">
+            {{ content }}
+          </article>
+
+        </div>
+      </main>
 
 
 
@@ -98,12 +98,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-

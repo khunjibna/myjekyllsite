@@ -15,3 +15,4 @@ pagination:
 
   
 baseurl: ""  # ถ้าโฮสต์ที่ root (ไม่มี subfolder)
+future: true
