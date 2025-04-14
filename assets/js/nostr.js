@@ -227,7 +227,7 @@ const relayUrls = [
 
   async function renderArticlePreview(naddr, container) {
     try {
-      const nip19 = window.nostrTools?.nip19;
+      const nip19 = window.nip19;
       if (!nip19) {
         console.error("❌ nip19 ไม่พร้อมใช้งาน!");
         return;
@@ -249,14 +249,13 @@ const relayUrls = [
       ];
   
       const ws = new WebSocket("wss://relay.damus.io");
-      ws.onopen = () => {
-        ws.send(JSON.stringify(articleReq));
-      };
+      ws.onopen = () => ws.send(JSON.stringify(articleReq));
   
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data[0] === "EVENT" && data[2].kind === 30023) {
           const article = JSON.parse(data[2].content);
+  
           const card = document.createElement('div');
           card.className = "bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-2";
   
@@ -272,6 +271,6 @@ const relayUrls = [
         }
       };
     } catch (err) {
-      console.error("❌ Invalid naddr หรือ decode ผิดพลาด:", naddr, err);
+      console.error("❌ decode ผิดพลาด:", err);
     }
   }
