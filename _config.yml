@@ -8,3 +8,8 @@ author:
   
 baseurl: ""  # ถ้าโฮสต์ที่ root (ไม่มี subfolder)
 future: true
+
+
+google_fonts: Noto Sans Thai
+og_image: /assets/img/share.jpg
+author_pubkey: npub1p7w6gyufuy3e6fnugvg9an7fyfes085qct2tp8sarctjwqdaqltsg47tzy

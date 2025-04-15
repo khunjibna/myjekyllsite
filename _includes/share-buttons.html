@@ -1,0 +1,26 @@
+<!-- Zap Button (Nostr) -->
+<div class="mt-4">
+    <button onclick="openZapModal()" class="bg-yellow-400 text-black px-4 py-1 rounded hover:bg-yellow-500 transition">
+      ⚡ ส่ง Zap ให้ผู้เขียน
+    </button>
+  </div>
+  
+  <!-- Zap Modal Script (เรียก nostr-tools หรือ WebLN) -->
+  <script>
+    function openZapModal() {
+      const pubkey = '{{ site.author_pubkey }}'; // กำหนดไว้ใน _config.yml
+      const amount = 1000; // millisat (1000 = 1 sat)
+      const lnurl = `nostr:${pubkey}?amount=${amount}`; // อาจต้องแปลงเป็น zap request จริงผ่าน protocol
+  
+      if (window.webln) {
+        window.webln.enable().then(() => {
+          window.webln.sendPayment(lnurl).then((r) => {
+            alert("⚡ ส่ง Zap เรียบร้อยแล้ว!");
+          }).catch((e) => alert("Zap ล้มเหลว: " + e));
+        });
+      } else {
+        alert("⚠️ Browser นี้ไม่รองรับ WebLN");
+      }
+    }
+  </script>
+  
