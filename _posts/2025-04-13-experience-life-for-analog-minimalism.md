@@ -9,6 +9,7 @@ summary: "หากวันหนึ่งไม่ได้ใช้หน้�
 
 
 <b>Experience life for Analog Minimalism</b>
+<br>
 หากวันหนึ่งไม่ได้ใช้หน้าจอจะเป็นยังไงนะ?
 <br><br>
 <img src="{{ '/assets/image/blog/20250413-001.jpg' | relative_url }}"
