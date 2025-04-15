@@ -6,7 +6,6 @@ const relayUrls = [
   'wss://nos.lol',
   'wss://nostr.wine',
   'wss://relay.notoshi.win',
-  'wss://relay.siamstr.com',
   'wss://relay.siamdev.cc/'
 ];
 
