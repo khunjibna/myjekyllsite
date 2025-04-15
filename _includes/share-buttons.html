@@ -1,26 +1,61 @@
-<!-- Zap Button (Nostr) -->
-<div class="mt-4">
-    <button onclick="openZapModal()" class="bg-yellow-400 text-black px-4 py-1 rounded hover:bg-yellow-500 transition">
-      ⚡ ส่ง Zap ให้ผู้เขียน
-    </button>
+<div class="mt-6 border p-4 rounded bg-yellow-50 max-w-sm">
+  <label for="zap-amount" class="block mb-2 text-sm font-medium text-gray-700">
+    💸 จำนวนที่ต้องการ Zap (sats):
+  </label>
+  <input id="zap-amount" type="number" min="1" step="1" value="100"
+         class="w-full p-2 border rounded mb-3">
+
+  <button onclick="fetchInvoice()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded">
+    ⚡ สร้าง QR สำหรับ Zap
+  </button>
+
+  <div id="zap-result" class="mt-4 hidden">
+    <p class="mb-2 text-sm text-gray-600">📱 สแกน QR ด้านล่างเพื่อชำระด้วย Lightning:</p>
+    <canvas id="zap-qr" class="mx-auto"></canvas>
+    <p class="text-xs text-center text-gray-400 mt-2" id="zap-pr"></p>
   </div>
-  
-  <!-- Zap Modal Script (เรียก nostr-tools หรือ WebLN) -->
-  <script>
-    function openZapModal() {
-      const pubkey = '{{ site.author_pubkey }}'; // กำหนดไว้ใน _config.yml
-      const amount = 1000; // millisat (1000 = 1 sat)
-      const lnurl = `nostr:${pubkey}?amount=${amount}`; // อาจต้องแปลงเป็น zap request จริงผ่าน protocol
-  
-      if (window.webln) {
-        window.webln.enable().then(() => {
-          window.webln.sendPayment(lnurl).then((r) => {
-            alert("⚡ ส่ง Zap เรียบร้อยแล้ว!");
-          }).catch((e) => alert("Zap ล้มเหลว: " + e));
-        });
-      } else {
-        alert("⚠️ Browser นี้ไม่รองรับ WebLN");
-      }
+</div>
+
+<!-- ต้องมี qrcode.js (ไม่ต้องติดตั้ง npm ใช้ผ่าน CDN ได้เลย) -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+<script>
+  async function fetchInvoice() {
+    const sats = parseInt(document.getElementById('zap-amount').value);
+    const resultEl = document.getElementById('zap-result');
+    const qrCanvas = document.getElementById('zap-qr');
+    const prEl = document.getElementById('zap-pr');
+
+    if (isNaN(sats) || sats < 1) {
+      alert("⚠️ กรุณาระบุจำนวน sats ที่ถูกต้อง");
+      return;
     }
-  </script>
-  
+
+    // 🔄 LN Address ที่ใช้สร้าง invoice
+    const lnurl = "https://ln.tips/api/lnurlp/yourname"; // 👈 เปลี่ยนตามของคุณ (เช่น ln.tips, zbd.gg, alby, nostr.pleb.dev)
+
+    try {
+      // ดึง callback เพื่อสร้าง invoice
+      const lnurlRes = await fetch(lnurl);
+      const lnData = await lnurlRes.json();
+
+      const callback = lnData.callback;
+      const amountMsat = sats * 1000;
+
+      const invoiceRes = await fetch(`${callback}?amount=${amountMsat}`);
+      const invoiceData = await invoiceRes.json();
+
+      if (invoiceData.pr) {
+        // แสดง QR
+        resultEl.classList.remove("hidden");
+        QRCode.toCanvas(qrCanvas, invoiceData.pr);
+        prEl.innerText = invoiceData.pr;
+      } else {
+        alert("ไม่สามารถสร้างใบแจ้งชำระได้ 😢");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("เกิดข้อผิดพลาดในการติดต่อเซิร์ฟเวอร์ LNURL");
+    }
+  }
+</script>
