@@ -45,27 +45,30 @@
       return;
     }
 
-    const lnurl = "https://walletofsatoshi.com/.well-known/lnurlp/khunjibna";
+    const lnurl = "{{ site.lightning.lnurl }}"; // ← มาจาก _config.yml เช่น https://walletofsatoshi.com/.well-known/lnurlp/jib
 
     try {
+      // Step 1: ดึงข้อมูล LNURL
       const lnurlRes = await fetch(lnurl);
       const lnData = await lnurlRes.json();
       const callback = lnData.callback;
-      const amountMsat = sats * 1000;
+      const amountMsat = sats * 1000; // sats → millisats
 
-      const invoiceRes = await fetch(`${callback}?amount=10`);
+      // Step 2: ขอ invoice ตามจำนวน
+      const invoiceRes = await fetch(`${callback}?amount=${amountMsat}`);
       const invoiceData = await invoiceRes.json();
 
       if (invoiceData.pr) {
+        // Step 3: สร้าง QR
         resultEl.classList.remove("hidden");
-        QRCode.toCanvas(qrCanvas, invoiceData.pr);
+        QRCode.toCanvas(qrCanvas, "lightning:" + invoiceData.pr); // เพิ่ม prefix lightning: ให้ mobile เข้าใจ
         prEl.innerText = invoiceData.pr;
       } else {
-        alert("ไม่สามารถสร้าง invoice ได้");
+        alert("ไม่สามารถสร้าง invoice ได้ 😢");
       }
     } catch (e) {
       console.error(e);
-      alert("❌ เกิดข้อผิดพลาดในการสร้าง QR: " + e.message);
+      alert("❌ เกิดข้อผิดพลาด: " + e.message);
     }
   }
 </script>
