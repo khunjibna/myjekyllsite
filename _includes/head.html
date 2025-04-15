@@ -13,13 +13,13 @@
     <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ page.url | absolute_url }}">
-    <meta property="og:image" content="{{ site.og_image | default: '/assets/img/og-default.jpg' | relative_url }}">
+    <meta property="og:image" content="{{ site.og_image | default: '/assets/image/web-banner.jpg' | relative_url }}">
   
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
     <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
-    <meta name="twitter:image" content="{{ site.og_image | default: '/assets/img/og-default.jpg' | relative_url }}">
+    <meta name="twitter:image" content="{{ site.og_image | default: '/assets/image/web-banner.jpg' | relative_url }}">
   
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ '/favicon.ico' | relative_url }}">
