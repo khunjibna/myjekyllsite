@@ -132,7 +132,16 @@ function displayLatestNotes(limit = 10) {
   notesArray.forEach(note => displayNoteOrImage(note.content, note.created_at));
 }
 
-setTimeout(() => displayLatestNotes(10), 2000);
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    const notesDiv = document.getElementById("notes");
+    if (notesDiv) {
+      displayLatestNotes(10);
+    } else {
+      console.warn("⚠️ ไม่พบ <div id='notes'> บนหน้า HTML");
+    }
+  }, 2000);
+});
 
 function renderArticlePreview(naddr, container) {
   if (!window.nip19) return console.error("nip19 not available");
