@@ -20,10 +20,10 @@
     <div class="lg:w-2/3 xl:w-3/4">
 
       <!-- Main post content -->
-      <main class="flex-1">
+      <main class="flex-1 px-2">
 
         <!-- 🔗 Breadcrumb -->
-        <nav class="text-sm text-gray-500 mb-4">
+        <nav class="text-sm text-gray-500 mb-4 px-2">
           <a href="/" class="text-blue-600 hover:underline">Home</a>
           {% if page.categories and page.categories.size > 0 %}
           {% assign primary_category = page.categories[0] %}
@@ -68,13 +68,17 @@
           </p>
 
           <!-- เนื้อหาโพสต์ -->
-          <article class="prose prose-indigo max-w-none">
+          <article class="prose prose-indigo max-w-none break-words">
             {{ content }}
           </article>
 
-          {% include share-buttons.html %} 
-
+         
           
+        </div>
+
+        <div class="bg-white border px-2 py-2 mt-2"> 
+          <div class="mb-2 pl-2"><b>สามารถสนับสนุนบทความนี้ผ่าน (Zap) ขอบคุณครับ</b></div>
+          {% include share-buttons.html %} 
         </div>
       </main>
 

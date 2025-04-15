@@ -1,44 +1,55 @@
-<div class="mt-6 border p-4 rounded bg-yellow-50 max-w-sm">
-  <label for="zap-amount" class="block mb-2 text-sm font-medium text-gray-700">
-    💸 จำนวนที่ต้องการ Zap (sats):
-  </label>
-  <input id="zap-amount" type="number" min="1" step="1" value="100"
-         class="w-full p-2 border rounded mb-3">
-
-  <button onclick="fetchInvoice()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded">
-    ⚡ สร้าง QR สำหรับ Zap
+<!-- _includes/zap-widget.html -->
+<div class="max-w-sm mx-auto">
+  <!-- ปุ่มหลัก -->
+  <button id="zap-toggle" onclick="toggleZapForm()" 
+          class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded">
+    ⚡ สนับสนุน
   </button>
 
-  <div id="zap-result" class="mt-4 hidden">
-    <p class="mb-2 text-sm text-gray-600">📱 สแกน QR ด้านล่างเพื่อชำระด้วย Lightning:</p>
-    <canvas id="zap-qr" class="mx-auto"></canvas>
-    <p class="text-xs text-center text-gray-400 mt-2" id="zap-pr"></p>
+  <!-- แบบฟอร์ม Zap (เริ่มต้นซ่อน) -->
+  <div id="zap-form" class="mt-4 border border-yellow-300 bg-yellow-50 p-4 rounded hidden break-words">
+    <label for="zap-amount" class="block mb-1 text-sm text-gray-700">💸 จำนวนที่ต้องการ (sats):</label>
+    <input id="zap-amount" type="number" min="1" step="1" value="{{ site.lightning.default_zap }}"
+           class="w-full p-2 border rounded mb-3">
+
+    <button onclick="fetchZapInvoice()"
+            class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 px-4 rounded">
+      🔄 สร้าง QR สำหรับ Zap
+    </button>
+
+    <div id="zap-result" class="mt-4 hidden text-center">
+      <p class="text-sm text-gray-600">📱 สแกน QR เพื่อสนับสนุน:</p>
+      <canvas id="zap-qr" class="mx-auto my-2"></canvas>
+      <p class="text-xs text-gray-400" id="zap-pr"></p>
+    </div>
   </div>
 </div>
 
-<!-- ต้องมี qrcode.js (ไม่ต้องติดตั้ง npm ใช้ผ่าน CDN ได้เลย) -->
+<!-- QR Code CDN -->
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
 
 <script>
-  async function fetchInvoice() {
+  function toggleZapForm() {
+    const form = document.getElementById('zap-form');
+    form.classList.toggle('hidden');
+  }
+
+  async function fetchZapInvoice() {
     const sats = parseInt(document.getElementById('zap-amount').value);
     const resultEl = document.getElementById('zap-result');
     const qrCanvas = document.getElementById('zap-qr');
     const prEl = document.getElementById('zap-pr');
 
     if (isNaN(sats) || sats < 1) {
-      alert("⚠️ กรุณาระบุจำนวน sats ที่ถูกต้อง");
+      alert("⚠️ กรุณาใส่จำนวน sats ที่ถูกต้อง");
       return;
     }
 
-    // 🔄 LN Address ที่ใช้สร้าง invoice
-    const lnurl = "https://walletofsatoshi.com/.well-known/lnurlp/khunjibna"; // 👈 เปลี่ยนตามของคุณ (เช่น ln.tips, zbd.gg, alby, nostr.pleb.dev)
+    const lnurl = "https://walletofsatoshi.com/.well-known/lnurlp/khunjibna";
 
     try {
-      // ดึง callback เพื่อสร้าง invoice
       const lnurlRes = await fetch(lnurl);
       const lnData = await lnurlRes.json();
-
       const callback = lnData.callback;
       const amountMsat = sats * 1000;
 
@@ -46,16 +57,15 @@
       const invoiceData = await invoiceRes.json();
 
       if (invoiceData.pr) {
-        // แสดง QR
         resultEl.classList.remove("hidden");
         QRCode.toCanvas(qrCanvas, invoiceData.pr);
         prEl.innerText = invoiceData.pr;
       } else {
-        alert("ไม่สามารถสร้างใบแจ้งชำระได้ 😢");
+        alert("ไม่สามารถสร้าง invoice ได้");
       }
     } catch (e) {
       console.error(e);
-      alert("เกิดข้อผิดพลาดในการติดต่อเซิร์ฟเวอร์ LNURL");
+      alert("❌ เกิดข้อผิดพลาดในการสร้าง QR: " + e.message);
     }
   }
 </script>
