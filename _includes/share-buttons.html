@@ -53,7 +53,7 @@
       const callback = lnData.callback;
       const amountMsat = sats * 1000;
 
-      const invoiceRes = await fetch(`${callback}?amount=${amountMsat}`);
+      const invoiceRes = await fetch(`${callback}?amount=10`);
       const invoiceData = await invoiceRes.json();
 
       if (invoiceData.pr) {

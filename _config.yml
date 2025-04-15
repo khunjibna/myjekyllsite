@@ -13,7 +13,3 @@ future: true
 google_fonts: Noto Sans Thai
 og_image: /assets/img/share.jpg
 author_pubkey: npub1p7w6gyufuy3e6fnugvg9an7fyfes085qct2tp8sarctjwqdaqltsg47tzy
-lightning:
-  lnurl: "https://walletofsatoshi.com/.well-known/lnurlp/khunjibna" # เปลี่ยนเป็นของคุณ
-  address: "khunjibna@walletofsatoshi.com"
-  default_zap: 100
