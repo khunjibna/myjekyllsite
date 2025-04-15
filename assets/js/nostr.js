@@ -1,5 +1,17 @@
-// Standalone nostr.js
-// ใช้กับ <script src="https://cdn.jsdelivr.net/npm/nostr-tools@2.12.0/lib/nostr.bundle.min.js"></script>
+if (!window.nip19 && window.nostrTools?.nip19) {
+  window.nip19 = window.nostrTools.nip19;
+}
+
+function isArticleNaddr(naddr) {
+  if (!window.nip19) return false;
+  try {
+    const decoded = window.nip19.decode(naddr);
+    return decoded.type === "naddr" && decoded.data.kind === 30023;
+  } catch (e) {
+    console.warn("decode ผิดพลาด:", e);
+    return false;
+  }
+}
 
 const relayUrls = [
   'wss://relay.damus.io',
@@ -16,30 +28,28 @@ const receivedNotes = new Map();
 relayUrls.forEach(relayUrl => {
   const ws = new WebSocket(relayUrl);
   ws.onopen = () => {
-    const profileRequest = ["REQ", "sub_id_1", { authors: [publicKey], kinds: [0] }];
-    const notesRequest = ["REQ", "sub_id_2", { authors: [publicKey], kinds: [1], limit: 100 }];
-    ws.send(JSON.stringify(profileRequest));
-    ws.send(JSON.stringify(notesRequest));
+    ws.send(JSON.stringify(["REQ", "sub_id_1", { authors: [publicKey], kinds: [0] }]));
+    ws.send(JSON.stringify(["REQ", "sub_id_2", { authors: [publicKey], kinds: [1], limit: 100 }]));
     fetchFollowersAndFollowing();
   };
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
       if (data[0] === "EVENT") {
-        if (data[2].kind === 0) {
-          const profile = JSON.parse(data[2].content);
+        const ev = data[2];
+        if (ev.kind === 0) {
+          const profile = JSON.parse(ev.content);
           if (!receivedProfiles.has(profile.name)) {
             receivedProfiles.add(profile.name);
             displayProfile(profile);
           }
-        } else if (data[2].kind === 1) {
-          const eventId = data[2].id;
-          const tags = data[2].tags || [];
+        } else if (ev.kind === 1) {
+          const tags = ev.tags || [];
           const isOriginalNote = !tags.some(tag => tag[0] === 'e');
-          if (isOriginalNote && !receivedNotes.has(eventId)) {
-            receivedNotes.set(eventId, {
-              content: data[2].content,
-              created_at: data[2].created_at
+          if (isOriginalNote && !receivedNotes.has(ev.id)) {
+            receivedNotes.set(ev.id, {
+              content: ev.content,
+              created_at: ev.created_at
             });
           }
         }
@@ -87,6 +97,8 @@ function displayNoteOrImage(noteContent, created_at) {
   const notesDiv = document.getElementById('notes');
   const container = document.createElement('div');
   container.className = "bg-white p-4 rounded-lg shadow text-gray-800 space-y-3";
+
+  // ✅ 1. ภาพ
   const imageRegex = /(https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|webp))/i;
   const imageMatch = noteContent.match(imageRegex);
   if (imageMatch) {
@@ -95,6 +107,8 @@ function displayNoteOrImage(noteContent, created_at) {
     img.className = "w-full max-w-lg rounded-lg mx-auto";
     container.appendChild(img);
   }
+
+  // ✅ 2. YouTube
   const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const youtubeMatch = noteContent.match(youtubeRegex);
   if (youtubeMatch) {
@@ -102,36 +116,140 @@ function displayNoteOrImage(noteContent, created_at) {
     const iframe = document.createElement('iframe');
     iframe.src = `https://www.youtube.com/embed/${videoId}`;
     iframe.width = "100%";
-    iframe.height = "315";
+    iframe.height = "630";
     iframe.className = "w-full rounded-lg";
     iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
     iframe.allowFullscreen = true;
     container.appendChild(iframe);
   }
-  const escaped = noteContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" class="text-blue-600 underline" target="_blank">$1</a>');
+
+  // ✅ 3. เตรียมข้อความก่อนแสดง
+  let cleanContent = noteContent
+    .replace(/https?:\/\/[^\s<]+?\.(jpg|jpeg|png|gif|webp)/gi, '')
+    .replace(/https?:\/\/(?:www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{11}/gi, '');
+
   const noteElement = document.createElement('div');
+  let escaped = cleanContent
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\n/g, "<br>")
+    .replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" class="text-blue-600 underline" target="_blank">$1</a>');
+
   noteElement.innerHTML = escaped;
   container.appendChild(noteElement);
-  const naddrRegex = /nostr:(naddr1[0-9a-z]+)/gi;
-  const matches = [...noteContent.matchAll(naddrRegex)];
-  matches.forEach(match => renderArticlePreview(match[1], container));
+
+  // ✅ 4. ตรวจหา nostr:npub1 หรือ nostr:naddr1
+  const nostrRegex = /nostr:(naddr1[0-9a-z]+|npub1[0-9a-z]+)/gi;
+  const matches = [...noteContent.matchAll(nostrRegex)];
+
+  matches.forEach(match => {
+    const fullTag = match[0]; // เช่น nostr:npub1xxx หรือ nostr:naddr1xxx
+    const value = match[1];
+  
+    if (value.startsWith('naddr1')) {
+      const pointer = getNaddrPointer(value);
+      if (pointer) {
+        const label = document.createElement('div');
+        label.className = "text-sm text-gray-600";
+        label.innerHTML = `
+          🔖 <strong>Kind:</strong> ${pointer.kind} |
+          <strong>ID:</strong> ${pointer.identifier} |
+          <strong>Pubkey:</strong> ${pointer.pubkey.slice(0, 12)}…`;
+        container.appendChild(label);
+      } else {
+        // ❗️ซ่อน fullTag ถ้า nip19 ยังไม่พร้อม
+        noteElement.innerHTML = noteElement.innerHTML.replace(fullTag, '');
+      }
+    }
+  
+    if (value.startsWith('npub1')) {
+      const replaced = replaceNpubLinksWithNames(fullTag, noteElement);
+      if (!replaced) {
+        noteElement.innerHTML = noteElement.innerHTML.replace(fullTag, '');
+      }
+    }
+  });
+
+  // ✅ 5. เวลา
   const date = new Date(created_at * 1000);
-  const formatted = date.toLocaleString("th-TH", { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const formatted = date.toLocaleString("th-TH", {
+    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+
   const timeElement = document.createElement('div');
   timeElement.className = "text-xs text-gray-500";
-  timeElement.textContent = `โพสต์เมื่อ ${formatted}`;
+  timeElement.textContent = `โพสต์เมื่อ ${formatted} น.`;
   container.appendChild(timeElement);
+
   notesDiv.appendChild(container);
 }
 
+
+function replaceNpubLinksWithNames(fullTag, container) {
+  if (!window.nip19 && window.nostrTools?.nip19) {
+    window.nip19 = window.nostrTools.nip19;
+  }
+
+  if (!window.nip19) {
+    console.warn("nip19 ยังไม่พร้อมใช้งาน");
+    return false;
+  }
+
+  const regex = /npub1[0-9a-z]+/i;
+  const match = fullTag.match(regex);
+  if (!match) return false;
+
+  const npub = match[0];
+  let pubkey;
+  try {
+    const decoded = window.nip19.decode(npub);
+    if (decoded.type !== 'npub') return false;
+    pubkey = decoded.data;
+  } catch (err) {
+    console.warn('decode npub ผิดพลาด:', err);
+    return false;
+  }
+
+  const ws = new WebSocket('wss://relay.nostr.wine');
+  ws.onopen = () => {
+    const req = ["REQ", `sub_${pubkey}`, { kinds: [0], authors: [pubkey], limit: 1 }];
+    ws.send(JSON.stringify(req));
+  };
+
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      if (data[0] === "EVENT" && data[2].kind === 0) {
+        const profile = JSON.parse(data[2].content);
+        const name = profile.display_name || profile.name || `${npub.slice(0, 12)}…`;
+        const tag = `<a href="https://njump.me/${npub}" target="_blank" class="text-purple-600 underline">@${name}</a>`;
+        container.innerHTML = container.innerHTML.replace(fullTag, tag);
+        ws.close();
+      }
+    } catch (err) {
+      console.error('profile decode ผิด:', err);
+    }
+  };
+
+  return true;
+}
+
+
 function displayLatestNotes(limit = 10) {
-  const notesArray = Array.from(receivedNotes.values()).sort((a, b) => b.created_at - a.created_at).slice(0, limit);
+  const notesArray = Array.from(receivedNotes.values())
+    .sort((a, b) => b.created_at - a.created_at)
+    .slice(0, limit);
   const notesDiv = document.getElementById('notes');
   notesDiv.innerHTML = '';
   notesArray.forEach(note => displayNoteOrImage(note.content, note.created_at));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (!window.nip19 && window.nostrTools?.nip19) {
+    window.nip19 = window.nostrTools.nip19;
+  }
+
   setTimeout(() => {
     const notesDiv = document.getElementById("notes");
     if (notesDiv) {
@@ -148,8 +266,10 @@ function renderArticlePreview(naddr, container) {
     const decoded = window.nip19.decode(naddr);
     if (decoded.type !== "naddr") return;
     const { pubkey, identifier } = decoded.data;
-    const articleReq = ["REQ", "sub_article", { kinds: [30023], authors: [pubkey], "#d": [identifier], limit: 1 }];
-    const ws = new WebSocket("wss://relay.damus.io");
+    const articleReq = ["REQ", "sub_article", {
+      kinds: [30023], authors: [pubkey], "#d": [identifier], limit: 1
+    }];
+    const ws = new WebSocket("wss://relay.notoshi.win");
     ws.onopen = () => ws.send(JSON.stringify(articleReq));
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
@@ -169,5 +289,33 @@ function renderArticlePreview(naddr, container) {
     };
   } catch (err) {
     console.error("decode ผิดพลาด:", err);
+  }
+}
+
+function getNaddrPointer(naddr) {
+  if (!window.nip19 && window.nostrTools?.nip19) {
+    window.nip19 = window.nostrTools.nip19;
+  }
+  if (!window.nip19) {
+    console.warn("nip19 not available");
+    return null;
+  }
+
+  try {
+    const decoded = window.nip19.decode(naddr);
+    if (decoded.type !== 'naddr') return null;
+
+    const { pubkey, kind, identifier, relays } = decoded.data;
+
+    return {
+      type: decoded.type,
+      pubkey,
+      kind,
+      identifier,
+      relays: relays || []
+    };
+  } catch (err) {
+    console.error("decode naddr ผิดพลาด:", err);
+    return null;
   }
 }
