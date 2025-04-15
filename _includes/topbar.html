@@ -27,3 +27,14 @@
     {% endfor %}
   </div>
 </header>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggleBtn = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    toggleBtn.addEventListener("click", function () {
+      mobileMenu.classList.toggle("hidden");
+    });
+  });
+</script>
