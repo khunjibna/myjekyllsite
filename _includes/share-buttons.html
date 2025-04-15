@@ -6,7 +6,7 @@
     ⚡ สนับสนุน
   </button>
 
-  <!-- แบบฟอร์ม Zap (เริ่มต้นซ่อน) -->
+  <!-- แบบฟอร์ม Zap -->
   <div id="zap-form" class="mt-4 border border-yellow-300 bg-yellow-50 p-4 rounded hidden break-words">
     <label for="zap-amount" class="block mb-1 text-sm text-gray-700">💸 จำนวนที่ต้องการ (sats):</label>
     <input id="zap-amount" type="number" min="1" step="1" value="{{ site.lightning.default_zap }}"
@@ -21,6 +21,7 @@
       <p class="text-sm text-gray-600">📱 สแกน QR เพื่อสนับสนุน:</p>
       <canvas id="zap-qr" class="mx-auto my-2"></canvas>
       <p class="text-xs text-gray-400" id="zap-pr"></p>
+      <!-- 🔗 ลิงก์เปิดในแอป Lightning จะถูกเพิ่มตรงนี้ -->
     </div>
   </div>
 </div>
@@ -45,24 +46,35 @@
       return;
     }
 
-    const lnurl = "{{ site.lightning.lnurl }}"; // ← มาจาก _config.yml เช่น https://walletofsatoshi.com/.well-known/lnurlp/jib
+    const lnurl = "{{ site.lightning.lnurl }}"; // เช่น https://walletofsatoshi.com/.well-known/lnurlp/jib
 
     try {
-      // Step 1: ดึงข้อมูล LNURL
       const lnurlRes = await fetch(lnurl);
       const lnData = await lnurlRes.json();
       const callback = lnData.callback;
-      const amountMsat = sats * 1000; // sats → millisats
+      const amountMsat = sats * 1000;
 
-      // Step 2: ขอ invoice ตามจำนวน
       const invoiceRes = await fetch(`${callback}?amount=${amountMsat}`);
       const invoiceData = await invoiceRes.json();
 
       if (invoiceData.pr) {
-        // Step 3: สร้าง QR
         resultEl.classList.remove("hidden");
-        QRCode.toCanvas(qrCanvas, "lightning:" + invoiceData.pr); // เพิ่ม prefix lightning: ให้ mobile เข้าใจ
+        QRCode.toCanvas(qrCanvas, "lightning:" + invoiceData.pr);
         prEl.innerText = invoiceData.pr;
+
+        // 🆕 เพิ่มลิงก์สำหรับเปิดในแอป (เฉพาะมือถือ)
+        const existingLink = document.getElementById('zap-mobile-link');
+        if (existingLink) existingLink.remove();
+
+        if (/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          const mobileLink = document.createElement('a');
+          mobileLink.href = "lightning:" + invoiceData.pr;
+          mobileLink.innerText = "⚡ เปิดในแอป Lightning";
+          mobileLink.className = "mt-2 inline-block text-yellow-600 underline text-sm";
+          mobileLink.setAttribute("target", "_blank");
+          mobileLink.id = "zap-mobile-link";
+          resultEl.appendChild(mobileLink);
+        }
       } else {
         alert("ไม่สามารถสร้าง invoice ได้ 😢");
       }
