@@ -4,7 +4,7 @@ title: "ปสก. ส่วนตัวกับการใช้งาน Bit
 date: 2025-04-03
 categories: [Article]
 image: /assets/image/blog/20250403-1/1.jpg
-summary: "ประสบการณ์การเดินทางไปใช้งาน Bitcoin Lightning ตอนที่หนึ่ง ณ เกาะช้าง จ.ตราด จะเป็นยังไงติดตามกัน"
+summary: "ประสบการณ์การเดินทางไปใช้งาน Bitcoin Lightning ตอนที่สอง ณ เกาะช้าง จ.ตราด จะเป็นยังไงติดตามกัน"
 ---
 
 <img src="{{ '/assets/image/blog/20250403-1/1.jpg' | relative_url }}"
