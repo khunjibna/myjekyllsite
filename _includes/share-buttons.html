@@ -54,7 +54,8 @@
       const callback = lnData.callback;
       const amountMsat = sats * 1000;
 
-      const invoiceRes = await fetch(`${callback}?amount=${amountMsat}`);
+      // ใส่ comment แบบกำหนดเอง
+      const invoiceRes = await fetch(`${callback}?amount=${amountMsat}&comment=${encodeURIComponent("Zap Article on Tamachirs.com")}`);
       const invoiceData = await invoiceRes.json();
 
       if (invoiceData.pr) {
