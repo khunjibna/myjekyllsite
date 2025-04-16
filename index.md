@@ -15,7 +15,6 @@ title: หน้าแรก
     
   </section>
 
-
   <!-- Slideshow -->
 <section>
   <h2 class="text-2xl font-semibold mb-4">📸 แนะนำบทความเด่น</h2>
@@ -46,6 +45,7 @@ title: หน้าแรก
       slides[current].classList.remove('opacity-0', 'pointer-events-none', 'z-0');
       slides[current].classList.add('opacity-100', 'pointer-events-auto', 'z-10');
     }, 5000);
+
   </script>
 </section>
 
@@ -59,7 +59,14 @@ title: หน้าแรก
             <img src="{{ post.image | default: '/assets/images/default.jpg' }}" alt="{{ post.title }}"
               class="w-full h-48 object-cover" />
             <div class="p-4">
-              <p class="text-xs text-gray-500">{{ post.date | date: "%-d %B %Y" }}</p>
+              {% assign months = "มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม" | split: "," %}
+              {% assign day = post.date | date: "%-d" %}
+              {% assign month_index = post.date | date: "%-m" | minus: 1 %}
+              {% assign month_thai = months[month_index] %}
+              {% assign year_thai = post.date | date: "%Y" | plus: 543 %}
+              
+              <p class="text-xs text-gray-500">{{ day }} {{ month_thai }} {{ year_thai }}</p>
+
               <h2 class="font-semibold text-lg text-gray-900 mb-1">{{ post.title }}</h2>
               <p class="text-sm text-gray-600 line-clamp-3">
                 {{ post.summary | default: post.excerpt | strip_html | truncatewords: 20 }}
