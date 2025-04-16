@@ -17,36 +17,37 @@ title: หน้าแรก
 
 
   <!-- Slideshow -->
-  <section>
-    <h2 class="text-2xl font-semibold mb-4">📸 แนะนำบทความเด่น</h2>
-    <div class="relative overflow-hidden rounded-xl shadow">
-      <div class="w-full h-64 relative">
-        {% for post in site.posts limit:5 %}
-          <div class="slide absolute inset-0 transition-opacity duration-700 opacity-0 {% if forloop.first %}opacity-100{% endif %}">
-            <a href="{{ post.url | relative_url }}">
-              <img src="{{ post.image | default: '/assets/images/default.jpg' }}" alt="{{ post.title }}"
-                   class="w-full h-full object-cover rounded-xl" />
-              <div class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-4 w-full">
-                <h3 class="text-lg font-semibold">{{ post.title }}</h3>
-              </div>
-            </a>
-          </div>
-        {% endfor %}
-      </div>
+<section>
+  <h2 class="text-2xl font-semibold mb-4">📸 แนะนำบทความเด่น</h2>
+  <div class="relative overflow-hidden rounded-xl shadow">
+    <div class="w-full h-64 relative">
+      {% for post in site.posts limit:5 %}
+        <div class="slide absolute inset-0 transition-opacity duration-700 opacity-0 pointer-events-none z-0 {% if forloop.first %}opacity-100 pointer-events-auto z-10{% endif %}">
+          <a href="{{ post.url | relative_url }}">
+            <img src="{{ post.image | default: '/assets/images/default.jpg' }}" alt="{{ post.title }}"
+                 class="w-full h-full object-cover rounded-xl" />
+            <div class="absolute bottom-0 left-0 bg-black bg-opacity-50 text-white p-4 w-full">
+              <h3 class="text-lg font-semibold">{{ post.title }}</h3>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
     </div>
-    <script>
-      // Basic slideshow script
-      const slides = document.querySelectorAll('.slide');
-      let current = 0;
-      setInterval(() => {
-        slides[current].classList.remove('opacity-100');
-        slides[current].classList.add('opacity-0');
-        current = (current + 1) % slides.length;
-        slides[current].classList.remove('opacity-0');
-        slides[current].classList.add('opacity-100');
-      }, 5000);
-    </script>
-  </section>
+  </div>
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('opacity-100', 'pointer-events-auto', 'z-10');
+      slides[current].classList.add('opacity-0', 'pointer-events-none', 'z-0');
+
+      current = (current + 1) % slides.length;
+
+      slides[current].classList.remove('opacity-0', 'pointer-events-none', 'z-0');
+      slides[current].classList.add('opacity-100', 'pointer-events-auto', 'z-10');
+    }, 5000);
+  </script>
+</section>
 
   <!-- Latest Posts -->
   <section>
