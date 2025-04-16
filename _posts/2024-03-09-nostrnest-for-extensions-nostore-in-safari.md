@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "การใช้งาน Nostrnest โดยใช้ Extensions Nostore"
-date: 2024-12-25
+date: 2024-03-09
 categories: [Article]
 image: /assets/image/blog/20240309-1/0.jpg
 summary: "แนะนำการใช้งาน nostrnest โดยใช้ extensions nostore บน safari สำหรับ IPhone"
