@@ -53,13 +53,18 @@ title: หน้าแรก
     <h2 class="text-2xl font-semibold mb-4">📰 บทความล่าสุด</h2>
     <div class="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       {% for post in site.posts limit:6 %}
-        <a href="{{ post.url | relative_url }}" class="block rounded-xl shadow overflow-hidden bg-white hover:shadow-lg transition">
-          <img src="{{ post.image | default: '/assets/images/default.jpg' }}" alt="{{ post.title }}" class="w-full h-40 object-cover" />
-          <div class="p-4">
-            <h3 class="font-semibold text-lg text-gray-900 mb-1">{{ post.title }}</h3>
-            <p class="text-sm text-gray-500">{{ post.date | date: "%-d %B %Y" }}</p>
-          </div>
-        </a>
+         <a href="{{ post.url | relative_url }}"
+            class="block rounded-xl shadow overflow-hidden bg-white hover:shadow-lg transition">
+            <img src="{{ post.image | default: '/assets/images/default.jpg' }}" alt="{{ post.title }}"
+              class="w-full h-48 object-cover" />
+            <div class="p-4">
+              <p class="text-xs text-gray-500">{{ post.date | date: "%-d %B %Y" }}</p>
+              <h2 class="font-semibold text-lg text-gray-900 mb-1">{{ post.title }}</h2>
+              <p class="text-sm text-gray-600 line-clamp-3">
+                {{ post.summary | default: post.excerpt | strip_html | truncatewords: 20 }}
+              </p>
+            </div>
+          </a>
       {% endfor %}
     </div>
   </section>
